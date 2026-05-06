@@ -1,5 +1,7 @@
 # Filament Backend
 
+> **Note:** This is a public copy of a private repository, published for portfolio purposes. Secrets and internal history have been stripped.
+
 Backend admin and API for Library Card using Laravel + Filament.
 
 ## Quick Start

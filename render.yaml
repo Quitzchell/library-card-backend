@@ -1,0 +1,89 @@
+services:
+  - type: web
+    name: library-card-filament
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /up
+    autoDeploy: true
+    envVars:
+      # --- Application ---
+      - key: APP_NAME
+        value: Laravel
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_LOCALE
+        value: en
+      - key: APP_FALLBACK_LOCALE
+        value: en
+      - key: APP_KEY
+        sync: false
+      - key: APP_URL
+        sync: false
+
+      # --- Logging (stderr → captured by Render's log stream) ---
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: warning
+
+      # --- Postgres on Supabase: pooler for app traffic ---
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "6543"
+      - key: DB_DATABASE
+        value: postgres
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+      # --- Postgres direct connection: used by entrypoint for migrations only ---
+      - key: MIGRATE_DB_HOST
+        sync: false
+      - key: MIGRATE_DB_PORT
+        value: "5432"
+
+      # --- Drivers (DB-backed; tables created by migrations) ---
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: BROADCAST_CONNECTION
+        value: log
+      - key: FILESYSTEM_DISK
+        value: s3
+
+      # --- Image optimizer: write WebP uploads to Supabase Storage ---
+      - key: IMAGE_DISK
+        value: s3
+
+      # --- Supabase Storage (S3-compatible API) ---
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        sync: false
+      - key: AWS_BUCKET
+        sync: false
+      - key: AWS_ENDPOINT
+        sync: false
+      - key: AWS_URL
+        sync: false
+      - key: AWS_USE_PATH_STYLE_ENDPOINT
+        value: "true"
+
+      # --- Mail (placeholder — switch when SMTP is wired) ---
+      - key: MAIL_MAILER
+        value: log

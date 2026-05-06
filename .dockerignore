@@ -1,0 +1,52 @@
+# Local env + secrets — never bake into the image
+src/.env
+src/.env.*
+!src/.env.example
+
+# SQLite dev DB
+src/database/database.sqlite
+src/database/database.sqlite-journal
+
+# Local storage state (rebuilt at runtime, or lives on Supabase in prod)
+src/storage/app/private/*
+!src/storage/app/private/.gitignore
+src/storage/app/public/*
+!src/storage/app/public/.gitignore
+src/storage/framework/cache/data/*
+src/storage/framework/sessions/*
+!src/storage/framework/sessions/.gitignore
+src/storage/framework/views/*
+!src/storage/framework/views/.gitignore
+src/storage/framework/testing/*
+src/storage/logs/*
+!src/storage/logs/.gitignore
+
+# Built artifacts (regenerated in Docker stages)
+src/vendor
+src/node_modules
+src/public/build
+src/public/hot
+src/bootstrap/cache/*.php
+
+# Dev-only container files (prod Dockerfile doesn't COPY these, but they're
+# tiny and we'd rather not break sibling builds that need server/).
+docker-compose.yml
+docker-compose.override.yml
+Makefile
+
+# VCS / IDE / OS
+.git
+.gitignore
+.gitattributes
+.github
+.vscode
+.idea
+.DS_Store
+*.swp
+
+# Tests / docs / scratch
+src/tests
+src/.phpunit.result.cache
+src/.phpunit.cache
+README.md
+*.md

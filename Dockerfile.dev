@@ -1,0 +1,72 @@
+# Use PHP-FPM base image
+FROM php:8.5-fpm-alpine3.23 AS base
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Install dependencies
+RUN apk add --no-cache \
+    curl \
+    git \
+    icu-dev \
+    libintl \
+    libzip-dev \
+    oniguruma-dev \
+    nodejs \
+    npm \
+    nginx \
+    supervisor \
+    openssh \
+    autoconf \
+    gcc \
+    g++ \
+    make \
+    postgresql-client \
+    postgresql-dev \
+    imagemagick \
+    imagemagick-jpeg \
+    imagemagick-webp \
+    imagemagick-dev
+
+# Install required PHP extensions
+RUN set -eux; \
+    for ext in pdo_pgsql intl zip bcmath pcntl; do \
+      docker-php-ext-install "$ext"; \
+    done
+
+# Install additional PHP extensions
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Imagick: needed so image optimization preserves ICC colour profiles and
+# converts wide-gamut sources (Display P3, Adobe RGB) to sRGB correctly.
+# GD silently strips profiles, which causes visible colour shifts.
+RUN pecl install imagick && docker-php-ext-enable imagick
+
+# Allow uploads up to 10 MB (matches prod; app caps individual files at 5 MB
+# but Livewire's multipart payloads need headroom over the raw file size).
+RUN { \
+        echo "upload_max_filesize=10M"; \
+        echo "post_max_size=10M"; \
+    } > "$PHP_INI_DIR/conf.d/zz-uploads.ini"
+
+# Remove build dependencies to keep image small
+RUN apk del autoconf gcc g++ make
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Copy in application files
+COPY ./src .
+
+# Copy Nginx and Supervisor configs
+COPY server/nginx.conf /etc/nginx/http.d/default.conf
+COPY server/supervisord.conf /etc/supervisord.conf
+
+# Expose port 80 for web
+EXPOSE 80
+
+# Ensure www-data user exists and chown files
+RUN chown -R www-data:www-data /var/www/html
+
+# Use supervisor to run php-fpm and nginx
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

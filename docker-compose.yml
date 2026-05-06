@@ -1,0 +1,10 @@
+
+services:
+  development:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./src:/var/www/html:delegated
+    ports:
+      - "8080:80"

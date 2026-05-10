@@ -1,12 +1,11 @@
 <?php
 
-namespace Rules;
+namespace App\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use function App\Rules\blank;
 
 class CaseInsensitiveUnique implements ValidationRule
 {

@@ -30,7 +30,7 @@ class TourDateController extends Controller
         return TourDateResource::collection(
             TourDate::query()
                 ->with('venue')
-                ->where('date', '>=', now())
+                ->where('date', '>=', now()->startOfDay())
                 ->orderBy('date')
                 ->paginate($request->integer('per_page', 15))
         );
@@ -41,7 +41,7 @@ class TourDateController extends Controller
         return TourDateResource::collection(
             TourDate::query()
                 ->with('venue')
-                ->where('date', '<', now())
+                ->where('date', '<', now()->startOfDay())
                 ->orderByDesc('date')
                 ->paginate($request->integer('per_page', 15))
         );
